@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KGP Lab Bench</title>
+<meta name="description" content="Practice bench for IIT Kharagpur Basic Electronics Lab experiments 2–5: function generator, oscilloscope, multimeter and trainer boards you wire yourself, with frequency-response graphs.">
+<meta name="theme-color" content="#e5e8e3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111614" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="KGP Lab Bench">
+<meta property="og:description" content="Wire the trainer boards, drive the AFG1022 and TBS1102C, measure with a multimeter and plot frequency responses. Unofficial practice tool for the Basic Electronics Lab.">
+<meta property="og:type" content="website">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lab Bench">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<noscript><p style="padding:16px">Lab Bench needs JavaScript to run.</p></noscript>
+<div class="wrap">
+<header class="appbar">
+  <a class="brand" href="#" aria-label="KGP Lab Bench home">
+    <img src="icons/favicon.svg" width="34" height="34" alt="">
+    <span><b>KGP Lab Bench</b><small>Basic Electronics Lab practice · Experiments 2–5</small></span>
+  </a>
+  <div class="appbar-actions">
+    <button type="button" class="ibtn" id="installBtn" hidden>Install app</button>
+    <button type="button" class="ibtn" id="helpBtn">How to use</button>
+    <button type="button" class="ibtn" id="aboutBtn">About</button>
+    <button type="button" class="ibtn" id="themeBtn">Theme: Auto</button>
+  </div>
+</header>
+<div class="banner" id="welcome" hidden>
+  <p><b>Everything starts unplugged, like the real bench.</b> Pick an experiment, wire the generator, probes and patch leads on the board, then set up the instruments as the manual describes.</p>
+  <div class="banner-actions"><button type="button" class="btn" id="welcomeHelp">Show me how</button><button type="button" class="btn ghost" id="welcomeClose">Got it</button></div>
+</div>
+<nav class="exps" id="exps" aria-label="Experiment"></nav>
+
+<div class="row inst">
+  <!-- ===== Function generator ===== -->
+  <section class="inst-case" aria-label="Tektronix AFG1022 function generator">
+    <div class="inst-top"><span class="mk">Tektronix</span><span class="model">AFG1022</span><span class="desc">Arbitrary / Function Generator · 25 MHz · 125 MS/s</span></div>
+    <div class="afg-body">
+      <div>
+        <div class="afg-screenwrap"><div class="afg-screen" id="fgScreen"></div></div>
+        <div class="afg-softrow" id="fgSoftKeys">
+          <button class="key" data-fs="0" aria-label="Soft key 1"></button><button class="key" data-fs="1" aria-label="Soft key 2"></button><button class="key" data-fs="2" aria-label="Soft key 3"></button><button class="key" data-fs="3" aria-label="Soft key 4"></button><button class="key" data-fs="4" aria-label="Soft key 5"></button>
+        </div>
+      </div>
+      <div class="afg-keys">
+        <div class="wavekeys">
+          <button class="key" data-wave="sine">Sine</button><button class="key" data-wave="square">Square</button>
+          <button class="key" data-wave="ramp">Ramp</button><button class="key" data-wave="pulse">Pulse</button>
+          <button class="key dark" id="fgUtil">Utility</button><button class="key dark" id="fgBack">Back</button>
+        </div>
+        <div class="keypad" id="fgPad">
+          <button class="key">7</button><button class="key">8</button><button class="key">9</button><button class="key dark" data-pk="bs">⌫</button>
+          <button class="key">4</button><button class="key">5</button><button class="key">6</button><button class="key dark" data-pk="esc">Esc</button>
+          <button class="key">1</button><button class="key">2</button><button class="key">3</button><button class="key dark" data-pk="left">◀</button>
+          <button class="key">0</button><button class="key">.</button><button class="key">±</button><button class="key dark" data-pk="right">▶</button>
+        </div>
+        <div class="afg-right">
+          <div data-knob="fg" data-label="Push Manual Trigger" data-big="1"></div>
+          <button class="key" id="fgOut"><span class="led"></span>CH1 On/Off</button>
+          <div class="bnc"><i></i>CH1 OUT</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Oscilloscope ===== -->
+  <section class="inst-case" aria-label="Tektronix TBS1102C oscilloscope">
+    <div class="inst-top"><span class="mk">Tektronix</span><span class="model">TBS1102C</span><span class="desc">Digital Storage Oscilloscope · 100 MHz · 1 GS/s</span></div>
+    <div class="dso-body">
+      <div class="dso-screenwrap">
+        <canvas id="scr" aria-label="Oscilloscope display"></canvas>
+        <div class="softkeys" id="scSoft">
+          <button class="key" data-ss="0" aria-label="Side key 1">1</button><button class="key" data-ss="1" aria-label="Side key 2">2</button><button class="key" data-ss="2" aria-label="Side key 3">3</button><button class="key" data-ss="3" aria-label="Side key 4">4</button><button class="key" data-ss="4" aria-label="Side key 5">5</button>
+        </div>
+      </div>
+      <div class="dso-panel">
+        <div class="btnrow">
+          <button class="key" id="bMeasure">Measure</button><button class="key" id="bTrigM">Trigger Menu</button><button class="key" id="bDefault">Default</button>
+          <button class="key blue" id="bAuto">Autoset</button><button class="key" id="bRun">Run / Stop</button><button class="key" id="bSingle">Single</button>
+        </div>
+        <div class="grp"><span class="gl">Multipurpose</span>
+          <div data-knob="mp" data-label="Turn · push to select" data-big="1"></div>
+        </div>
+        <div class="grp"><span class="gl">Vertical</span>
+          <div class="vgrid">
+            <div class="vcol"><button class="key chkey c1" id="bCh1">CH1<br>Menu</button><div data-knob="c1pos" data-label="Position"></div><div data-knob="c1sc" data-label="Scale V/div"></div></div>
+            <div class="vcol"><button class="key chkey c2" id="bCh2">CH2<br>Menu</button><div data-knob="c2pos" data-label="Position"></div><div data-knob="c2sc" data-label="Scale V/div"></div></div>
+          </div>
+        </div>
+        <div class="grp"><span class="gl">Horizontal</span>
+          <div data-knob="hpos" data-label="Position · push zero"></div><div data-knob="hsc" data-label="Scale s/div"></div>
+        </div>
+        <div class="grp"><span class="gl">Trigger</span>
+          <div data-knob="tlev" data-label="Level · push 50%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="row lower">
+  <section class="card" aria-label="Trainer board">
+    <div class="board-head"><h2 id="bTitle"></h2><span id="bSub"></span></div>
+    <div class="tabs" id="circTabs"></div>
+    <div class="bbar" id="bbar"></div>
+    <div class="schem" id="schemWrap"></div>
+    <div id="hintBox"></div>
+    <div class="ctrls" id="ctrls"></div>
+    <div class="meter" id="meter" aria-label="Digital multimeter">
+      <div class="m-face">
+        <div class="m-brand"><b>DMM</b><span>TRUE RMS · AUTO RANGE</span></div>
+        <div class="m-lcd"><span class="m-flags" id="mFlags"></span><span class="m-val" id="mVal">OFF</span><span class="m-unit" id="mUnit"></span></div>
+        <div class="m-mid">
+          <button type="button" class="m-btn" id="mSel">SELECT</button>
+          <div class="m-dial" id="mDial"><div class="m-knob" id="mKnob"><i></i></div></div>
+          <button type="button" class="m-btn" id="mHold">HOLD</button>
+        </div>
+        <div class="m-jacks"><span>10A</span><span>mA</span><span>COM</span><span>VΩHz</span></div>
+      </div>
+      <div class="m-info" id="mInfo"></div>
+    </div>
+    <details open><summary>Procedure from the manual</summary><ol id="procList"></ol></details>
+    <details><summary>Expected values · check after you measure</summary><div class="th" id="theory"></div><p class="note" id="theoryNote"></p></details>
+  </section>
+
+  <section class="card log" aria-label="Graph and observations">
+    <div class="board-head"><h2>Graph &amp; observations</h2><span id="logSub"></span></div>
+    <div class="tabs" id="gKinds"></div>
+    <div class="gopts" id="gOpts"></div>
+    <div class="btns">
+      <button class="btn" id="bRec">Record reading</button>
+      <button class="btn ghost" id="bSweep">Auto sweep</button>
+      <button class="btn ghost" id="bUndo">Undo last</button>
+      <button class="btn ghost" id="bClr">Clear</button>
+      <button class="btn ghost" id="bCsv">Download CSV</button>
+      <button class="btn ghost" id="bPng">Save graph</button>
+    </div>
+    <div class="gmsg" id="gMsg"></div>
+    <canvas id="plot" aria-label="Graph"></canvas>
+    <div class="gres" id="gRes"></div>
+    <div class="tbl"><table><thead id="logHead"></thead><tbody id="logBody"></tbody></table></div>
+    <p class="note" id="gNote"></p>
+  </section>
+</div>
+<footer class="foot">
+  <p class="credit">Made by <b>26BT10049 &amp; friends</b></p>
+  <p>Unofficial practice tool for students of the Basic Electronics Laboratory, IIT Kharagpur. Not made by, affiliated with or endorsed by IIT Kharagpur or Tektronix. The simulation is simplified, so real readings will differ; follow your instructor and the official lab manual.</p>
+</footer>
+</div>
+
+<dialog class="dlg" id="helpDlg" aria-labelledby="helpTitle">
+  <form method="dialog">
+    <div class="dlg-head"><h2 id="helpTitle">How to use Lab Bench</h2><button class="x" value="close" aria-label="Close">✕</button></div>
+    <div class="dlg-body">
+      <ol class="steps">
+        <li><b>Pick the experiment and circuit</b> from the chips at the top and the tabs above the board. The link in the address bar opens that same circuit, so you can share it.</li>
+        <li><b>Wire the board.</b> Click a socket, or a lead end on the tags above the board (AFG1022, CH1, CH2, MULTIMETER, DC SUPPLY), then click where the other end goes. Click the ✕ on a lead to pull it out. <i>Check wiring</i> tells you what is missing; <i>Show expected connections</i> draws dashed hints.</li>
+        <li><b>Set the generator.</b> Utility › System › Set to Default, then Utility › Setup › CH1 Load › High Z. Choose the waveform, type a value on the keypad and press a unit soft key, then press <i>CH1 On/Off</i>.</li>
+        <li><b>Set the scope.</b> Default, then each CH menu › Probe › 1X. Press Autoset. Measure › CH1 or CH2 opens the list: turn the multipurpose knob and push it to add Pk-Pk, Frequency and so on.</li>
+        <li><b>Knobs:</b> drag up or down, scroll, use the ◀ ▶ buttons, or focus a knob and press the arrow keys. Click a knob without dragging to push it.</li>
+        <li><b>Multimeter:</b> turn the dial, place its two leads, and use SELECT for diode test and continuity. Resistance and capacitance need the power off.</li>
+        <li><b>Graph:</b> press <i>Record reading</i> at each setting, or <i>Auto sweep</i>. Readings taken with different settings become separate lines. <i>Download CSV</i> and <i>Save graph</i> give you files for your record.</li>
+      </ol>
+      <p class="note">Your wiring and readings are saved in this browser only.</p>
+    </div>
+  </form>
+</dialog>
+<dialog class="dlg" id="aboutDlg" aria-labelledby="aboutTitle">
+  <form method="dialog">
+    <div class="dlg-head"><h2 id="aboutTitle">About Lab Bench</h2><button class="x" value="close" aria-label="Close">✕</button></div>
+    <div class="dlg-body">
+      <p>A practice bench for the Basic Electronics Laboratory experiments at IIT Kharagpur: the AFG1022 function generator, TBS1102C oscilloscope, a handheld multimeter and the trainer boards, drawn from the lab manual.</p>
+      <ul>
+        <li>Experiment 2 · RC, CR and RL circuits, voltage divider</li>
+        <li>Experiment 3 · Rectifier and power supply</li>
+        <li>Experiment 4 · Small-signal CE amplifier</li>
+        <li>Experiment 5 · Analog circuits with the 741 op-amp</li>
+      </ul>
+      <p><b>Limits.</b> The circuits use simplified models. Component values the manual does not print are assumed, and some part positions on the op-amp board are read from photos, so check them against your own board. Diode and transistor types on the Experiment 2 board are assumed for practice.</p>
+      <p><b>Not official.</b> This tool is not made by, affiliated with or endorsed by IIT Kharagpur or the E&amp;ECE Department. Tektronix, AFG1022 and TBS1102C are trademarks of Tektronix, Inc., named here only to describe the instruments being imitated.</p>
+      <p><b>Credits.</b> Made by 26BT10049 &amp; friends.</p>
+      <p><button type="button" class="btn ghost" id="resetBtn">Clear all saved wiring and readings</button></p>
+    </div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>

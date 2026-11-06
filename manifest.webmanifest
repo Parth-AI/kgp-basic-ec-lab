@@ -1,0 +1,17 @@
+{
+  "name": "KGP Lab Bench",
+  "short_name": "Lab Bench",
+  "description": "Practice bench for IIT Kharagpur Basic Electronics Lab experiments 2–5. Unofficial.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#e5e8e3",
+  "theme_color": "#10262e",
+  "categories": ["education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
